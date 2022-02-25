@@ -20,7 +20,8 @@
     "test": "jest"
   },
   "engines": {
-    "node": ">= 8.9"
+    "node": ">= 8.9",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

@@ -37,13 +37,15 @@ deploy:
     stage: deploy
     only:
         - master
+    except:
+        - pipelines
+        - schedules
     before_script:
         - yarn install
     script:
         - yarn version --patch
         - git push --follow-tags git@gitlab.mycyclone.com:$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
         - yarn install
-        - npm publish
     tags:
         - builder
 
