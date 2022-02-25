@@ -20,7 +20,14 @@ install:
 test:
     stage: test
     only:
-        - master
+        - api
+        - pipelines
+        - schedules
+        - web
+        - triggers
+        - merge_requests
+    before_script:
+        - yarn install
     script:
         - yarn test
     tags:
@@ -30,6 +37,8 @@ deploy:
     stage: deploy
     only:
         - master
+    before_script:
+        - yarn install
     script:
         - yarn version --patch
         - git push --follow-tags git@gitlab.mycyclone.com:$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
