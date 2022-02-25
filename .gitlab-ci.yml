@@ -3,6 +3,9 @@ image: node:latest
 stages:
   - deploy
 
+only:
+- tags
+
 deploy:
   stage: deploy
   script:
