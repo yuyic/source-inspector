@@ -1,4 +1,3 @@
-image: node:latest
 
 stages:
   - install
@@ -24,6 +23,8 @@ test:
         - master
     script:
         - yarn test
+    tags:
+        - tester
 
 deploy:
     stage: deploy
@@ -34,4 +35,6 @@ deploy:
         - git push --follow-tags git@gitlab.mycyclone.com:$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
         - yarn install
         - npm publish
+    tags:
+        - builder
 
