@@ -1,5 +1,5 @@
 stages:
-  - install
+  - prebuild
   - test
   - deploy
 
@@ -9,7 +9,7 @@ cache:
     - node_modules/
 
 install:
-    stage: install
+    stage: prebuild
     script:
         - yarn install
     only:
@@ -22,6 +22,8 @@ test:
         - master
     script:
         - yarn test
+    tags:
+        - tester
 
 
 deploy:
@@ -33,4 +35,6 @@ deploy:
         - git push --follow-tags git@gitlab.mycyclone.com:$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME
         - yarn install
         - npm publish
+    tags:
+        - builder
 
