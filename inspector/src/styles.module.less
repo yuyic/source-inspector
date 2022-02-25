@@ -1,0 +1,91 @@
+:global(#__open-in-editor__){
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 12000!important;
+    box-sizing: border-box;
+    transition: all .15s;
+    // border: solid 2px rgba(0,0,0,0);
+    pointer-events:none;
+}
+
+.layer{
+    pointer-events:none;
+    position: relative;
+}
+.frame{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border: solid 4px rgba(0,0,0,0);
+    transition: all .15s;
+    z-index: 200;
+}
+.detail{
+    z-index: 100;
+    position:absolute;
+    display: flex;
+    align-items: center;
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-weight: bold;
+    padding: 6px 8px;
+    pointer-events: none;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    font-size: 14px;
+
+    .title{
+        color:blue;
+    }
+
+    .left{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .right{
+        color: rgb(215, 215, 215);
+    }
+    .subTitle{
+        color:lightseagreen;
+        font-size: 12px;
+    }
+}
+
+.content{
+    background-color: rgba(120, 170, 210, 0.7);
+    pointer-events: none;
+    display: flex;
+    box-sizing: border-box;
+    flex:1;
+}
+.padding{
+    border-color: rgba(77, 200, 0, 0.3);
+    pointer-events: none;
+    border-style: solid;
+    display: flex;
+    box-sizing: border-box;
+    flex:1;
+}
+.border{
+    border-color: rgba(255, 200, 50, 0.3);
+    pointer-events: none;
+    border-style: solid;
+    display: flex;
+    box-sizing: border-box;
+    flex:1;
+}
+.margin{
+    position:absolute;
+    z-index: 100;
+    border-color: rgba(255, 155, 0, 0.3);
+    pointer-events: none;
+    border-style: solid;
+    display: flex;
+    box-sizing: border-box;
+}

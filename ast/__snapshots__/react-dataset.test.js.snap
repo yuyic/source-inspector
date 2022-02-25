@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`reactDataset can convert closet jsxElement 1`] = `
+"const App = () => <div data-test=\\"test\\" />;
+"
+`;
+
+exports[`reactDataset can convert createElement 1`] = `
+"React.createElement(\\"div\\", {
+  \\"data-test\\": \\"test\\"
+});
+"
+`;
+
+exports[`reactDataset can convert createElement with null props 1`] = `
+"React.createElement(\\"div\\", {
+  \\"data-test\\": \\"test\\"
+}, \\"text\\");
+"
+`;
+
+exports[`reactDataset can convert createElement with props 1`] = `
+"React.createElement(\\"div\\", {
+  \\"data-test\\": \\"test\\"
+}, \\"text\\");
+"
+`;
+
+exports[`reactDataset can convert createElement with undefined props 1`] = `
+"React.createElement(\\"div\\", {
+  \\"data-test\\": \\"test\\"
+}, \\"text\\");
+"
+`;
+
+exports[`reactDataset can convert jsxElement 1`] = `
+"const App = () => <div data-test=\\"test\\">test</div>;
+"
+`;
+
+exports[`reactDataset will not converte jsxfragment 1`] = `
+"const App = () => <></>;
+"
+`;
+
+exports[`reactDataset will not converte react fragment 1`] = `
+"import React from \\"react\\";
+
+const App = () => <React.Fragment />;
+"
+`;
+
+exports[`reactDataset will not converte react fragment alias 1`] = `
+"import { Fragment as Frag } from \\"react\\";
+
+const App = () => <Frag />;
+"
+`;
+
+exports[`reactDataset will not converte react fragment raw 1`] = `
+"import { Fragment } from \\"react\\";
+
+const App = () => <Fragment />;
+"
+`;
+
+exports[`reactDataset will not converte react fragment raw and alias 1`] = `
+"import React, { Fragment as frag2 } from \\"react\\";
+
+const App = () => <React.Fragment />;
+
+const App2 = () => <frag2 />;
+"
+`;
