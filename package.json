@@ -8,7 +8,8 @@
     "inspector",
     "webpack",
     "ast",
-    "index.js"
+    "index.js",
+    "vite.config.js"
   ],
   "main": "index.js",
   "publishConfig": {
