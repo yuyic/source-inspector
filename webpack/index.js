@@ -3,6 +3,19 @@ const path = require("path");
 const { sources } = require("webpack");
 const { AssetsDir, OutDir } = require("../inspector");
 
+const readTemplate = (publicPath = "/") => {
+    const templatePath = path.resolve(OutDir, "index.html");
+    const template = fs.readFileSync(templatePath, "utf-8");
+    const result = template
+        .replace(/<script[a-z1-9"'\/ =]*?src="(.*?)"/g, function (a, b) {
+            return a.replace(b, path.join(publicPath, b));
+        })
+        .replace(/<link[a-z1-9"'\/ =]*?href="(.*?)"/g, function (a, b) {
+            return a.replace(b, path.join(publicPath, b));
+        });
+    return result;
+};
+
 class OpenInEditorPlugin {
     constructor(options) {
         this.options = {
@@ -16,15 +29,14 @@ class OpenInEditorPlugin {
 
     apply(compiler) {
         const pluginName = "open-in-editor-plugin";
-        const htmlTemplate = path.resolve(OutDir, "index.html");
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
-        const template = fs.readFileSync(htmlTemplate);
         const assetsFiles = fs.readdirSync(assetsAbsDir);
+        const template = readTemplate(compiler.options?.output?.publicPath);
 
         const assetsSources = assetsFiles.map((assetKey) => {
             const assetPath = path.join(AssetsDir, assetKey);
             const assetSource = fs.readFileSync(
-                path.join(assetsAbsDir, assetKey),
+                path.resolve(assetsAbsDir, assetKey),
                 "utf-8"
             );
             const source = new sources.RawSource(assetSource);
@@ -56,7 +68,6 @@ class OpenInEditorPlugin {
                     const htmlAssetKeys = Object.keys(assets).filter((key) =>
                         /\.html$/.test(key)
                     );
-
                     htmlAssetKeys.forEach((htmlAssetKey) => {
                         const htmlAsset = compilation.getAsset(htmlAssetKey);
                         const contents = htmlAsset.source.source();
