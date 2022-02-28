@@ -23,5 +23,6 @@ module.exports = {
   ]
 }
 ```
-### ⚠️`暂时只支持react，有需要再支持vue`
-### ⚠️不能定位三方包创建的元素，比如antd的Modal.confirm
+### `暂时只支持react，有需要再支持vue`
+
+### `不支持通过antd直接创建的元素，比如没有定义content的Modal.confirm`

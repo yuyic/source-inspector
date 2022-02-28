@@ -18,6 +18,7 @@
   },
   "scripts": {
     "inspect": "vite",
+    "build": "vite build",
     "test": "jest"
   },
   "engines": {

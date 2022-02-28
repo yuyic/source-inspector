@@ -1,10 +1,10 @@
 const { defineConfig } = require("vite");
 const reactRefresh = require("@vitejs/plugin-react-refresh");
-const path = require("path");
-// https://vitejs.dev/config/
+const { RootDir, AssetsDir, OutDir } = require("./inspector");
+
 module.exports = defineConfig({
     plugins: [reactRefresh()],
-    root: path.resolve(__dirname, "inspector/src"),
+    root: RootDir,
     esbuild: {
         jsxInject: `import React from 'react';`,
     },
@@ -18,5 +18,9 @@ module.exports = defineConfig({
             generateScopedName: "[name]-[local]-[hash:base64:5]",
             hashPrefix: "prefix",
         },
+    },
+    build: {
+        outDir: OutDir,
+        assetsDir: AssetsDir,
     },
 });
