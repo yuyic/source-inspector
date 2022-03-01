@@ -28,6 +28,11 @@ class OpenInEditorPlugin {
     }
 
     apply(compiler) {
+        if (compiler.options.mode !== "development") {
+            console.warn("Open editor only works in development mode");
+            return;
+        }
+
         const pluginName = "open-in-editor-plugin";
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
         const assetsFiles = fs.readdirSync(assetsAbsDir);
