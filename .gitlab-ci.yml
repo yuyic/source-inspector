@@ -16,6 +16,8 @@ install:
     only:
         changes:
         - yarn.lock
+    tags:
+        - installer
 
 test:
     stage: test
