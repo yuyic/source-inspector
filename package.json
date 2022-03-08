@@ -38,13 +38,15 @@
     "less": "^4.1.2",
     "loader-utils": "2.0.2",
     "magic-string": "^0.26.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "vite": "^2.8.4",
     "webpack": "^5.70.0",
     "yarn": "^1.22.17"
   },
   "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "jest": {
     "testEnvironment": "node"
