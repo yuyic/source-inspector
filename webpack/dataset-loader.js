@@ -1,4 +1,7 @@
-const { reactDataset } = require("../ast");
+const { reactDataset, vueDataset } = require("../ast");
+const { getOptions } = require("loader-utils");
+const { validate } = require("schema-utils");
+
 const CWD = process.cwd();
 
 const schema = {
@@ -13,12 +16,16 @@ const schema = {
 
 module.exports = function loader(source) {
     const filename = this.resourcePath;
-
     if (!filename || filename.match(/node_modules/g)) {
         return source;
     }
 
-    const rawOptions = this.getOptions(schema);
+    const isVue = /\.vue$/.test(filename);
+    const rawOptions = getOptions(this);
+    validate(schema, rawOptions, {
+        name: "dataset-loader",
+        baseDataPath: "options",
+    });
 
     const options = {
         ...rawOptions,
@@ -28,14 +35,16 @@ module.exports = function loader(source) {
             const relative = absolute.replace(CWD, "");
             return {
                 key: rawOptions.dataKey || "data-open-in-editor",
-                value: `${absolute}|${relative}|${displayName}|react`,
+                value: `${absolute}|${relative}|${displayName}|${
+                    isVue ? "vue" : "react"
+                }`,
             };
         },
     };
 
     // TODO vue
-    if (/\.vue$/.test(filename)) {
-        return source;
+    if (isVue) {
+        return vueDataset(source, options);
     } else {
         return reactDataset(source, options);
     }

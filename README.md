@@ -4,7 +4,7 @@
 
 ![](./20220225_151400.gif)
 
-## Webpack
+## Webpack（兼容4，5）
 
 ```
 const OpenEditorWebpackPlugin = require('open-editor/webpack')
@@ -23,6 +23,6 @@ module.exports = {
   ]
 }
 ```
-### `暂时只支持react，有需要再支持vue`
+### `支持react，vue`
 
 ### `不支持通过antd直接创建的元素，比如没有定义content的Modal.confirm`

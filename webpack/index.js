@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { sources } = require("webpack");
+const sources = require("webpack-sources");
 const { AssetsDir, OutDir } = require("../inspector");
 
 const readTemplate = (publicPath = "/") => {
@@ -33,11 +33,14 @@ class OpenInEditorPlugin {
             return;
         }
 
+        const webpackPath = require.resolve("webpack", {
+            paths: [process.cwd()],
+        });
+        const webpack = require(webpackPath).version.startsWith("4") ? 4 : 5;
         const pluginName = "open-in-editor-plugin";
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
-        const assetsFiles = fs.readdirSync(assetsAbsDir);
         const template = readTemplate(compiler.options?.output?.publicPath);
-
+        const assetsFiles = fs.readdirSync(assetsAbsDir);
         const assetsSources = assetsFiles.map((assetKey) => {
             const assetPath = path.join(AssetsDir, assetKey);
             const assetSource = fs.readFileSync(
@@ -50,6 +53,34 @@ class OpenInEditorPlugin {
                 source,
             };
         });
+        const emitAssets = (compilation, assets) => {
+            const htmlAssetKeys = Object.keys(assets).filter((key) =>
+                /\.html$/.test(key)
+            );
+            htmlAssetKeys.forEach((htmlAssetKey) => {
+                const htmlAsset = compilation.getAsset(htmlAssetKey);
+                const source = getHtmlResource(htmlAsset);
+                compilation.updateAsset(htmlAssetKey, source);
+            });
+            assetsSources.forEach(({ assetPath, source }) => {
+                if (!compilation.getAsset(assetPath)) {
+                    compilation.emitAsset(assetPath, source);
+                }
+            });
+        };
+
+        const getHtmlResource = (asset) => {
+            if (/\.html$/.test(asset.name)) {
+                const contents = asset.source.source().toString("utf-8");
+                const newHtmlContents = contents.replace(
+                    /<body>([\s\S]*)<\/body>/g,
+                    (a, b) => {
+                        return b + template;
+                    }
+                );
+                return new sources.RawSource(newHtmlContents);
+            }
+        };
 
         compiler.options.module?.rules.push({
             test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
@@ -62,40 +93,24 @@ class OpenInEditorPlugin {
             },
         });
 
-        compiler.hooks.compilation.tap(pluginName, (compilation) => {
-            compilation.hooks.processAssets.tap(
-                {
-                    name: pluginName,
-                    stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
-                    additionalAssets: true,
-                },
-                (assets) => {
-                    const htmlAssetKeys = Object.keys(assets).filter((key) =>
-                        /\.html$/.test(key)
-                    );
-                    htmlAssetKeys.forEach((htmlAssetKey) => {
-                        const htmlAsset = compilation.getAsset(htmlAssetKey);
-                        const contents = htmlAsset.source.source();
-                        const newHtmlContents = contents.replace(
-                            /<body>([\s\S]*)<\/body>/g,
-                            (a, b) => {
-                                return b + template;
-                            }
-                        );
-                        compilation.updateAsset(
-                            htmlAssetKey,
-                            new sources.RawSource(newHtmlContents)
-                        );
-                    });
-
-                    assetsSources.forEach(({ assetPath, source }) => {
-                        if (!compilation.getAsset(assetPath)) {
-                            compilation.emitAsset(assetPath, source);
-                        }
-                    });
-                }
-            );
-        });
+        if (webpack === 4) {
+            compiler.hooks.emit.tap(pluginName, (compilation) => {
+                emitAssets(compilation, compilation.assets);
+            });
+        } else {
+            compiler.hooks.compilation.tap(pluginName, (compilation) => {
+                compilation.hooks.processAssets.tap(
+                    {
+                        name: pluginName,
+                        stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+                        additionalAssets: true,
+                    },
+                    (assets) => {
+                        emitAssets(compilation, assets);
+                    }
+                );
+            });
+        }
     }
 }
 
