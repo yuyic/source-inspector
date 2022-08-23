@@ -76,7 +76,7 @@ module.exports = function reactDataset(source, options) {
                     ) {
                         args[1] = t.objectExpression([]);
                     }
-                    args[1].properties.push(property);
+                    args[1].properties?.push(property);
                 }
             },
         },
