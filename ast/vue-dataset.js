@@ -23,7 +23,7 @@ module.exports = function vueDataset(source, options) {
                         );
                         const attribute = ` ${key}="${value}" `;
                         const insertIdx = start.offset + node.tag.length + 1;
-                        magic.appendLeft(insertIdx + 1, attribute);
+                        magic.appendLeft(insertIdx, attribute);
                     }
                 },
             ],

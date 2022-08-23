@@ -82,7 +82,10 @@ class OpenInEditorPlugin {
             }
         };
 
-        compiler.options.module?.rules.push({
+        const oneOfIdx = compiler.options.module.rules.findIndex(
+            (rule) => !!rule.oneOf
+        );
+        compiler.options.module?.rules.splice(Math.max(oneOfIdx, 0), 0, {
             test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
             exclude: [/node_modules/],
             use: {
@@ -92,6 +95,16 @@ class OpenInEditorPlugin {
                 },
             },
         });
+        // compiler.options.module?.rules.push({
+        //     test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
+        //     exclude: [/node_modules/],
+        //     use: {
+        //         loader: path.resolve(__dirname, "./dataset-loader.js"),
+        //         options: {
+        //             dataKey: this.options.dataKey,
+        //         },
+        //     },
+        // });
 
         if (webpack === 4) {
             compiler.hooks.emit.tap(pluginName, (compilation) => {

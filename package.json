@@ -14,7 +14,7 @@
   "main": "index.js",
   "publishConfig": {
     "access": "public",
-    "registry": "http://cyclone-npm01.sh.mycyclone.com/"
+    "registry": "http://172.25.128.89:21081/repository/npm-internal/"
   },
   "scripts": {
     "inspect": "vite",
