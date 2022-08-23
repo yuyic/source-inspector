@@ -10,6 +10,7 @@ exports.parseModule = function (source) {
             "typescript",
             "jsx",
             ["decorators", { decoratorsBeforeExport: true }],
+            "logicalAssignment",
         ],
     });
 };
