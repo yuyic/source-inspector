@@ -73,7 +73,8 @@ class OpenInEditorPlugin {
             if (/\.html$/.test(asset.name)) {
                 const contents = asset.source.source().toString("utf-8");
                 const newHtmlContents = contents.replace(
-                    /<body>([\s\S]*)<\/body>/g,
+                    // /<body>([\s\S]*)<\/body>/g,
+                    /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
                     (a, b) => {
                         return b + template;
                     }
