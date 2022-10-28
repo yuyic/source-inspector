@@ -23,6 +23,16 @@ module.exports = {
   ]
 }
 ```
+## Vite
+```
+import OpenEditorPlugin from "open-editor/vite";
+
+export default defineConfig({
+  plugins: [OpenEditorPlugin()]
+});
+
+```
+
 ### `支持react，vue`
 
 ### `不支持通过antd直接创建的元素，比如没有定义content的Modal.confirm`
