@@ -4,7 +4,11 @@
 
 ![](./20220225_151400.gif)
 
-## Webpack（version 4，5）
+```bash
+npm install source-inspector --save-dev # or yarn add source-inspector --save-dev
+```
+
+## Webpack（version 4 or 5）
 
 ```
 const SourceInspectorWebpackPlugin = require('source-inspector/webpack')
@@ -17,7 +21,7 @@ module.exports = {
   },
   plugins: [
     new SourceInspectorWebpackPlugin({
-        editor: "vscode", // eg: sublime，textmate，emacs，macvim，phpstorm，webstorm，idea，atom，vscode，默认vscode
+        editor: "vscode", // eg: sublime，textmate，emacs，macvim，phpstorm，webstorm，idea，atom，vscode; vscode by default
         hotKey: "Alt" // trigger inspector
     })
   ]
