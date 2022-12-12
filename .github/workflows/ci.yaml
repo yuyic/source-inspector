@@ -1,0 +1,58 @@
+name: Node CI
+
+on:
+    push:
+        branches:
+            - master
+        paths-ignore:
+            - "**/*.md"
+    pull_request:
+        types:
+            - "opened"
+            - "synchronize"
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                node-version: [14.x, 16.x, 18.x]
+                os: [ubuntu-latest, windows-latest]
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+
+            - name: Use Node.js ${{ matrix.node_version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  registry-url: "https://registry.npmjs.org/"
+                  cache: "pnpm"
+
+            - name: restore lerna
+              id: cache
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      node_modules
+                      */*/node_modules
+                  key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+            - name: install
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: yarn install
+            - run: yarn build
+            - run: npm test --forceExit
+
+            # - name: patch version
+            #   run: yarn version --patch
+
+            # - name: Push to master
+            #   run: git push --follow-tags origin master
+
+            # - name: Publish to NPM
+            #   run: npm publish --access public
+            #   env:
+            #       NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

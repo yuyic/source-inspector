@@ -24,7 +24,7 @@ module.exports = function OpenEditorPlugin(options) {
     const assetsAbsDir = path.resolve(OutDir, AssetsDir);
     const template = readTemplate(publicPath);
     return {
-        name: "open-editor",
+        name: "source-inspector",
         enforce: "pre",
         config(config) {
             setObjValue(config, "server.fs.strict", false);

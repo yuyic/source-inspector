@@ -1,13 +1,13 @@
-# open-editor
+# source-inspector
 
-* 在IDE中打开前端元素对应的源码
+* Inspect html elements' source code in IDE
 
 ![](./20220225_151400.gif)
 
-## Webpack（兼容4，5）
+## Webpack（version 4，5）
 
 ```
-const OpenEditorWebpackPlugin = require('open-editor/webpack')
+const SourceInspectorWebpackPlugin = require('source-inspector/webpack')
 
 module.exports = {
   entry: 'index.js',
@@ -16,23 +16,22 @@ module.exports = {
     filename: 'index_bundle.js'
   },
   plugins: [
-    new OpenEditorWebpackPlugin({
-        editor: "vscode", // 编辑器，支持sublime，textmate，emacs，macvim，phpstorm，webstorm，idea，atom，vscode，默认vscode
-        hotKey: "Alt" // 开启元素抓取的热键， 默认Alt
+    new SourceInspectorWebpackPlugin({
+        editor: "vscode", // eg: sublime，textmate，emacs，macvim，phpstorm，webstorm，idea，atom，vscode，默认vscode
+        hotKey: "Alt" // trigger inspector
     })
   ]
 }
 ```
 ## Vite
 ```
-import OpenEditorPlugin from "open-editor/vite";
+import SourceInspectorPlugin from "source-inspector/vite";
 
 export default defineConfig({
-  plugins: [OpenEditorPlugin()]
+  plugins: [SourceInspectorPlugin()]
 });
 
 ```
 
-### `支持react，vue`
+### `Support react and vue`
 
-### `不支持通过antd直接创建的元素，比如没有定义content的Modal.confirm`

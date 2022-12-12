@@ -1,8 +1,8 @@
 {
-  "name": "open-editor",
-  "version": "0.1.10",
+  "name": "source-inspector",
+  "version": "0.1.1",
   "license": "MIT",
-  "description": "Open source code in IDE",
+  "description": "Inspect html elements' source code in IDE",
   "author": "Yichong Yu <yuyicman@gmail.com> (https://github.com/yuyic)",
   "files": [
     "inspector",
@@ -12,9 +12,9 @@
     "vite.config.js"
   ],
   "main": "index.js",
-  "publishConfig": {
-    "access": "public",
-    "registry": "http://172.25.128.89:21081/repository/npm-internal/"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuyic/source-inspector"
   },
   "scripts": {
     "inspect": "vite",
@@ -22,7 +22,7 @@
     "test": "jest"
   },
   "engines": {
-    "node": ">= 8.9",
+    "node": ">= 14.18.1",
     "yarn": "^1.22.4"
   },
   "dependencies": {
