@@ -4,13 +4,6 @@ on:
     push:
         branches:
             - master
-        paths-ignore:
-            - "**/*.md"
-    pull_request:
-        types:
-            - "opened"
-            - "synchronize"
-    workflow_dispatch:
 
 jobs:
     build:
@@ -29,9 +22,8 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   registry-url: "https://registry.npmjs.org/"
-                  cache: "pnpm"
 
-            - name: restore lerna
+            - name: cache
               id: cache
               uses: actions/cache@v2
               with:
@@ -43,8 +35,17 @@ jobs:
             - name: install
               if: steps.cache.outputs.cache-hit != 'true'
               run: yarn install
-            - run: yarn build
-            - run: npm test --forceExit
+
+            - name: build
+              run: yarn build
+
+            - name: test
+              run: yarn test --forceExit
+
+            # - name: config git user
+            #   run: |
+            #     git config --local user.email "yuyicman@gmail.com"
+            #     git config --local user.name "Yichong Yu"
 
             # - name: patch version
             #   run: yarn version --patch
