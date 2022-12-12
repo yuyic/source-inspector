@@ -3,8 +3,17 @@ const path = require("path");
 const sources = require("webpack-sources");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 
+/**
+ * @typedef {{ dataKey?:string, publicPath?:string }} PluginOptions
+ */
+
 class OpenInEditorPlugin {
+    /**
+     * @constructor
+     * @param {PluginOptions} [options]
+     */
     constructor(options) {
+        /** @private */
         this.options = {
             port: 10047,
             hotKey: 18,
@@ -26,7 +35,16 @@ class OpenInEditorPlugin {
         const webpack = require(webpackPath).version.startsWith("4") ? 4 : 5;
         const pluginName = "open-in-editor-plugin";
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
-        const template = readTemplate(compiler.options?.output?.publicPath);
+
+        const isNext = /_next\/$/.test(compiler.options.output.publicPath);
+
+        const template = readTemplate(
+            path.join(
+                compiler.options?.output?.publicPath,
+                isNext ? "static" : ""
+            )
+        );
+
         const assetsFiles = fs.readdirSync(assetsAbsDir);
         const assetsSources = assetsFiles.map((assetKey) => {
             const assetPath = path.join(AssetsDir, assetKey);
@@ -50,6 +68,10 @@ class OpenInEditorPlugin {
                 compilation.updateAsset(htmlAssetKey, source);
             });
             assetsSources.forEach(({ assetPath, source }) => {
+                if (isNext) {
+                    assetPath = path.join("../static", assetPath);
+                }
+
                 if (!compilation.getAsset(assetPath)) {
                     compilation.emitAsset(assetPath, source);
                 }
@@ -80,6 +102,28 @@ class OpenInEditorPlugin {
                 },
             },
         });
+
+        if (isNext) {
+            compiler.options.module.rules.push({
+                test(req) {
+                    if (
+                        req.includes(path.join(compiler.context, "pages")) ||
+                        req.includes(path.join(compiler.context, "app"))
+                    ) {
+                        return /\.(js|jsx|ts|tsx|md|mdx|mjs)$/i.test(req);
+                    }
+                    return false;
+                },
+                include: compiler.context,
+                exclude: /node_modules/,
+                use: {
+                    loader: path.resolve(__dirname, "./next-patch-loader.js"),
+                    options: {
+                        template,
+                    },
+                },
+            });
+        }
 
         if (webpack === 4) {
             compiler.hooks.emit.tap(pluginName, (compilation) => {

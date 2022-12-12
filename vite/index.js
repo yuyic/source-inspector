@@ -3,6 +3,17 @@ const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
 
+/**
+ * @typedef {{ dataKey?:string, publicPath?:string }} PluginOptions
+ */
+
+/**
+ * Vite plugin
+ *
+ * @param {PluginOptions} [options]
+ * @return {import("vite").Plugin}
+ */
+
 module.exports = function OpenEditorPlugin(options) {
     const CWD = process.cwd();
     const publicPath = options?.publicPath ?? "/";
