@@ -1,6 +1,6 @@
 {
   "name": "source-inspector",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "description": "Inspect html elements' source code in IDE",
   "author": "Yichong Yu <yuyicman@gmail.com> (https://github.com/yuyic)",
