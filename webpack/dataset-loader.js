@@ -43,9 +43,15 @@ module.exports = function loader(source) {
     };
 
     // TODO vue
-    if (isVue) {
-        return vueDataset(source, options);
-    } else {
-        return reactDataset(source, options);
+    try{
+        if (isVue) {
+            return vueDataset(source, options);
+        } else {
+            return reactDataset(source, options);
+        }
+    }
+    catch(e){
+        console.log('[source-inspector] %s %s', options.filename, e.message);
+        return source;
     }
 };
