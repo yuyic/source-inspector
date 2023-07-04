@@ -9,3 +9,4 @@ npm-exec.bat
 **/debug
 .vscode
 **/dist
+test/__tmp__

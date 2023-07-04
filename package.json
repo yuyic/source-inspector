@@ -5,7 +5,8 @@
   "description": "Inspect html elements' source code in IDE",
   "author": "Yichong Yu <yuyicman@gmail.com> (https://github.com/yuyic)",
   "files": [
-    "inspector",
+    "inspector/index.js",
+    "inspector/dist",
     "webpack",
     "vite",
     "ast",
@@ -20,7 +21,15 @@
   "scripts": {
     "inspect": "vite",
     "build": "vite build",
-    "test": "jest"
+    "test": "run-s -c test:pre \"test:exec {@}\" test:post --",
+    "test:webpack-4": "cross-env WEBPACK_VERSION=4 yarn test",
+    "test:pre": "run-s yalc:publish yalc:add",
+    "test:exec": "cross-env DEBUG=true jest",
+    "test:post": "yarn yalc:clean",
+    "yalc:add": "yalc add --dev source-inspector",
+    "yalc:clean": "yalc remove --all",
+    "yalc:publish": "yalc publish --no-scripts",
+    "prepublishOnly": "yarn build && yarn test"
   },
   "engines": {
     "node": ">= 14.18.1",
@@ -38,21 +47,34 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
+    "@babel/preset-react": "^7.22.5",
     "@vitejs/plugin-react-refresh": "^1.3.6",
+    "babel-loader": "8.1.0",
+    "cross-env": "^7.0.3",
+    "fs-extra": "^10.0.0",
+    "get-port": "5.1.1",
     "is-electron": "^2.2.1",
     "jest": "^27.5.1",
+    "jest-environment-node": "27.5.1",
     "less": "^4.1.2",
+    "module-alias": "^2.2.3",
+    "npm-run-all": "^4.1.5",
+    "puppeteer": "^13.4.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "semver": "^7.5.1",
+    "typescript": "^5.1.3",
     "vite": "^2.8.4",
-    "webpack": "^5.70.0",
-    "yarn": "^1.22.17"
+    "webpack": "^5.87.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "4.2.1",
+    "webpack.legacy": "npm:webpack@4.x",
+    "yalc": "^1.0.0-pre.53",
+    "yarn": "^1.22.17",
+    "yn": "4.0.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
-  },
-  "jest": {
-    "testEnvironment": "node"
   }
 }

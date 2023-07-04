@@ -1,4 +1,4 @@
-const reactDataset = require("./react-dataset");
+const reactDataset = require("../../ast/react-dataset");
 
 const options = {
     factory() {

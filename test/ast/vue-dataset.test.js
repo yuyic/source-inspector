@@ -1,4 +1,4 @@
-const vueDataset = require("./vue-dataset");
+const vueDataset = require("../../ast/vue-dataset");
 
 const options = {
     factory() {
