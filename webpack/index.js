@@ -40,7 +40,7 @@ class OpenInEditorPlugin {
         });
         const webpack = require(webpackPath);
         const webpackVersion = webpack.version.startsWith("4") ? 4 : 5;
-        const pluginName = "open-in-editor-plugin";
+        const pluginName = "source-inspector-plugin";
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
         const template = readTemplate(compiler.options?.output?.publicPath);
         const assetsFiles = fs.readdirSync(assetsAbsDir);
