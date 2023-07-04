@@ -11,9 +11,10 @@
     "vite",
     "ast",
     "index.js",
-    "vite.config.js"
+    "types"
   ],
   "main": "index.js",
+  "types": "types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuyic/source-inspector"
@@ -29,7 +30,10 @@
     "yalc:add": "yalc add --dev source-inspector",
     "yalc:clean": "yalc remove --all",
     "yalc:publish": "yalc publish --no-scripts",
-    "prepublishOnly": "yarn build && yarn test"
+    "types:clean": "rimraf types",
+    "types:compile": "tsc -p tsconfig.json",
+    "generate-types": "run-s types:clean types:compile",
+    "prepublishOnly": "yarn generate-types"
   },
   "engines": {
     "node": ">= 14.18.1",
@@ -63,7 +67,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "semver": "^7.5.1",
-    "typescript": "^5.1.3",
+    "typescript": "^5.1.6",
     "vite": "^2.8.4",
     "webpack": "^5.87.0",
     "webpack-cli": "^4.9.1",
