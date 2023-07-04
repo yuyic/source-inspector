@@ -45,30 +45,25 @@ exports[`reactDataset will not converte jsxfragment 1`] = `
 
 exports[`reactDataset will not converte react fragment 1`] = `
 "import React from \\"react\\";
-
 const App = () => <React.Fragment />;
 "
 `;
 
 exports[`reactDataset will not converte react fragment alias 1`] = `
 "import { Fragment as Frag } from \\"react\\";
-
 const App = () => <Frag />;
 "
 `;
 
 exports[`reactDataset will not converte react fragment raw 1`] = `
 "import { Fragment } from \\"react\\";
-
 const App = () => <Fragment />;
 "
 `;
 
 exports[`reactDataset will not converte react fragment raw and alias 1`] = `
 "import React, { Fragment as frag2 } from \\"react\\";
-
 const App = () => <React.Fragment />;
-
 const App2 = () => <frag2 />;
 "
 `;
