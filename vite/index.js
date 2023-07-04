@@ -3,9 +3,19 @@ const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
 
+/**
+ * @param {Object} [options]
+ * @param {string} [options.hotKey]
+ * @param {string} [options.editor]
+ */
 module.exports = function OpenEditorPlugin(options) {
     const CWD = process.cwd();
     const publicPath = options?.publicPath ?? "/";
+    /**
+     * 
+     * @param {string} filename 
+     * @returns 
+     */
     const createOptions = (filename) => ({
         ...options,
         filename,
