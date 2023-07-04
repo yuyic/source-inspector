@@ -1,9 +1,19 @@
 const fs = require("fs");
 const path = require("path");
 const sources = require("webpack-sources");
-const { AssetsDir, OutDir, readTemplate } = require("../inspector");
+const {
+    AssetsDir,
+    OutDir,
+    readTemplate,
+    extractInspectorCode,
+} = require("../inspector");
 
 class OpenInEditorPlugin {
+    /**
+     * @param {Object} [options]
+     * @param {string|number} [options.hotKey]
+     * @param {string} [options.editor]
+     */
     constructor(options) {
         this.options = {
             port: 10047,
@@ -14,6 +24,11 @@ class OpenInEditorPlugin {
         };
     }
 
+    /**
+     *
+     * @param {import("webpack").Compiler} compiler
+     * @returns
+     */
     apply(compiler) {
         if (compiler.options.mode !== "development") {
             console.warn("Open editor only works in development mode");
@@ -23,7 +38,8 @@ class OpenInEditorPlugin {
         const webpackPath = require.resolve("webpack", {
             paths: [process.cwd()],
         });
-        const webpack = require(webpackPath).version.startsWith("4") ? 4 : 5;
+        const webpack = require(webpackPath);
+        const webpackVersion = webpack.version.startsWith("4") ? 4 : 5;
         const pluginName = "open-in-editor-plugin";
         const assetsAbsDir = path.resolve(OutDir, AssetsDir);
         const template = readTemplate(compiler.options?.output?.publicPath);
@@ -41,14 +57,14 @@ class OpenInEditorPlugin {
             };
         });
         const emitAssets = (compilation, assets) => {
-            const htmlAssetKeys = Object.keys(assets).filter((key) =>
-                /\.html$/.test(key)
-            );
-            htmlAssetKeys.forEach((htmlAssetKey) => {
-                const htmlAsset = compilation.getAsset(htmlAssetKey);
-                const source = getHtmlResource(htmlAsset);
-                compilation.updateAsset(htmlAssetKey, source);
-            });
+            // const htmlAssetKeys = Object.keys(assets).filter((key) =>
+            //     /\.html$/.test(key)
+            // );
+            // htmlAssetKeys.forEach((htmlAssetKey) => {
+            //     const htmlAsset = compilation.getAsset(htmlAssetKey);
+            //     const source = getHtmlResource(htmlAsset);
+            //     compilation.updateAsset(htmlAssetKey, source);
+            // });
             assetsSources.forEach(({ assetPath, source }) => {
                 if (!compilation.getAsset(assetPath)) {
                     compilation.emitAsset(assetPath, source);
@@ -56,19 +72,28 @@ class OpenInEditorPlugin {
             });
         };
 
-        const getHtmlResource = (asset) => {
-            if (/\.html$/.test(asset.name)) {
-                const contents = asset.source.source().toString("utf-8");
-                const newHtmlContents = contents.replace(
-                    // /<body>([\s\S]*)<\/body>/g,
-                    /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
-                    (a, b) => {
-                        return b + template;
-                    }
-                );
-                return new sources.RawSource(newHtmlContents);
-            }
-        };
+        // const getHtmlResource = (asset) => {
+        //     if (/\.html$/.test(asset.name)) {
+        //         const contents = asset.source.source().toString("utf-8");
+        //         const newHtmlContents = contents.replace(
+        //             // /<body>([\s\S]*)<\/body>/g,
+        //             /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
+        //             (a, b) => {
+        //                 return (
+        //                     b +
+        //                     `<script>
+        //                     window.__open_in_editor__ = ${JSON.stringify({
+        //                         hotKey: this.options.hotKey,
+        //                         editor: this.options.editor,
+        //                     })}
+        //                     </script>` +
+        //                     template
+        //                 );
+        //             }
+        //         );
+        //         return new sources.RawSource(newHtmlContents);
+        //     }
+        // };
 
         compiler.options.module?.rules.push({
             test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
@@ -81,7 +106,7 @@ class OpenInEditorPlugin {
             },
         });
 
-        if (webpack === 4) {
+        if (webpackVersion === 4) {
             compiler.hooks.emit.tap(pluginName, (compilation) => {
                 emitAssets(compilation, compilation.assets);
             });
@@ -99,6 +124,24 @@ class OpenInEditorPlugin {
                 );
             });
         }
+        new webpack.BannerPlugin({
+            entryOnly: true,
+            include: compiler.options.bundleName
+                ? compiler.options.bundleName + ".js"
+                : /\.js$/,
+            raw: true,
+            banner: `
+            (function(){
+                if(typeof document !== 'undefined'){
+                    ${extractInspectorCode(template)}
+                    window.__open_in_editor__ = ${JSON.stringify({
+                        hotKey: this.options.hotKey,
+                        editor: this.options.editor,
+                    })};
+                }
+            })();
+            `,
+        }).apply(compiler);
     }
 }
 
