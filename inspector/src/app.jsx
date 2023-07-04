@@ -45,7 +45,10 @@ export const App = ({ config }) => {
                 const data = map.get(target);
                 if (data) {
                     const [absolutePath] = data.split("|");
-                    const [path, line, column] = absolutePath.split(":");
+                    const pathSplits = absolutePath.split(":");
+                    const [line, column] = pathSplits.slice(-2);
+                    const path = pathSplits.slice(0,-2).join(":");
+
                     launchEditor({
                         path,
                         line,
