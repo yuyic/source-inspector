@@ -2,6 +2,7 @@ const path = require("path");
 const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
+const createLaunchEditorMiddleware = require("launch-editor-middleware");
 
 /**
  * @param {Object} [options]
@@ -12,9 +13,9 @@ module.exports = function OpenEditorPlugin(options) {
     const CWD = process.cwd();
     const publicPath = options?.publicPath ?? "/";
     /**
-     * 
-     * @param {string} filename 
-     * @returns 
+     *
+     * @param {string} filename
+     * @returns
      */
     const createOptions = (filename) => ({
         ...options,
@@ -40,6 +41,12 @@ module.exports = function OpenEditorPlugin(options) {
             setObjValue(config, "server.fs.strict", false);
             return config;
         },
+        configureServer(server) {
+            server.middlewares.use(
+                "/__launch__",
+                createLaunchEditorMiddleware()
+            );
+        },
         transform(code, id) {
             const opts = createOptions(id);
             if (/\.(j|t)(s|sx)$/.test(id)) {
@@ -58,7 +65,21 @@ module.exports = function OpenEditorPlugin(options) {
             return html.replace(
                 /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
                 (a, b) => {
-                    return b + templateContent;
+                    return (
+                        b +
+                        `
+                    <script>
+                        (function(){
+                            if(typeof document !== 'undefined'){
+                                window.__open_in_editor__ = ${JSON.stringify({
+                                    hotKey: options?.hotKey || 18,
+                                })};
+                            }
+                        })();
+                    </script>
+                    ` +
+                        templateContent
+                    );
                 }
             );
         },

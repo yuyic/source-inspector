@@ -21,7 +21,6 @@ module.exports = {
   },
   plugins: [
     new SourceInspectorWebpackPlugin({
-        editor: "vscode", // eg: sublime，textmate，emacs，macvim，phpstorm，webstorm，idea，atom，vscode; vscode by default
         hotKey: "Alt" // trigger inspector
     })
   ]

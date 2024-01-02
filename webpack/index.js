@@ -7,19 +7,18 @@ const {
     readTemplate,
     extractInspectorCode,
 } = require("../inspector");
+const createLaunchEditorMiddleware = require("launch-editor-middleware");
 
 class OpenInEditorPlugin {
     /**
      * @param {Object} [options]
      * @param {string|number} [options.hotKey]
-     * @param {string} [options.editor]
      */
     constructor(options) {
         this.options = {
             port: 10047,
             hotKey: 18,
             dataKey: "data-open-in-editor",
-            editor: "vscode",
             ...options,
         };
     }
@@ -95,6 +94,27 @@ class OpenInEditorPlugin {
         //     }
         // };
 
+        const rawAfterSetup =
+            compiler.options.devServer?.onAfterSetupMiddleware;
+        compiler.options.devServer = Object.assign(
+            {},
+            compiler.options.devServer,
+            {
+                onAfterSetupMiddleware(devServer) {
+                    if (!devServer) {
+                        throw new Error("webpack-dev-server is not defined");
+                    }
+                    if (rawAfterSetup) {
+                        rawAfterSetup(devServer);
+                    }
+                    devServer.app.use(
+                        "/__launch__",
+                        createLaunchEditorMiddleware()
+                    );
+                },
+            }
+        );
+
         compiler.options.module?.rules.push({
             test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
             exclude: [/node_modules/],
@@ -136,7 +156,6 @@ class OpenInEditorPlugin {
                     ${extractInspectorCode(template)}
                     window.__open_in_editor__ = ${JSON.stringify({
                         hotKey: this.options.hotKey,
-                        editor: this.options.editor,
                     })};
                 }
             })();
