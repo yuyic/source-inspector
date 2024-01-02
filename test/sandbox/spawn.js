@@ -175,7 +175,34 @@ function spawnWebpackServe(port, dirs, options = {}) {
     );
 }
 
+/**
+ * @param {number} port
+ * @param {Object} dirs
+ * @param {string} dirs.public
+ * @param {string} dirs.root
+ * @param {string} dirs.src * @param {SpawnOptions} [options]
+ * @returns {Promise<import('child_process').ChildProcess | void>}
+ */
+function spawnVite(port, dirs, options = {}) {
+    const viteBin = getPackageExecutable("vite");
+
+    return spawnTestProcess(
+        viteBin,
+        [
+            dirs.src,
+            "-c",
+            path.join(dirs.root, "vite.config.js"),
+            "--port",
+            port,
+        ],
+        {
+            successMessage: "> Local",
+            ...options,
+        }
+    );
+}
 module.exports = {
     killTestProcess,
     spawnWebpackServe,
+    spawnVite,
 };

@@ -23,6 +23,26 @@ function getIndexHTML(port) {
 }
 
 /**
+ * @param {number} port
+ * @returns {string}
+ */
+function getViteEntry(port) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sandbox React App</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/index.jsx"></script>
+</body>
+</html>
+`;
+}
+
+/**
  * @param {boolean} esModule
  * @returns {string}
  */
@@ -101,4 +121,27 @@ module.exports = {
 `;
 }
 
-module.exports = { getIndexHTML, getPackageJson, getWDSConfig };
+/**
+ * @param {string} srcDir
+ * @returns {string}
+ */
+function getViteConfig(srcDir, OutDir) {
+    return `
+    const { vite:SourceInspectorPlugin } = require("source-inspector");
+    const { defineConfig } = require("vite");
+
+    module.exports = defineConfig({
+      plugins: [SourceInspectorPlugin()],
+      root: "${srcDir}"
+    });
+
+  `;
+}
+
+module.exports = {
+    getIndexHTML,
+    getPackageJson,
+    getWDSConfig,
+    getViteConfig,
+    getViteEntry,
+};

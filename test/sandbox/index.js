@@ -2,8 +2,14 @@ const path = require("path");
 const fse = require("fs-extra");
 const getPort = require("get-port");
 const { nanoid } = require("nanoid");
-const { getIndexHTML, getPackageJson, getWDSConfig } = require("./configs");
-const { killTestProcess, spawnWebpackServe } = require("./spawn");
+const {
+    getIndexHTML,
+    getPackageJson,
+    getWDSConfig,
+    getViteConfig,
+    getViteEntry,
+} = require("./configs");
+const { killTestProcess, spawnWebpackServe, spawnVite } = require("./spawn");
 
 // Extends the timeout for tests using the sandbox
 jest.setTimeout(1000 * 60);
@@ -70,12 +76,14 @@ const posixPath = (str) => str.split(path.sep).join(path.posix.sep);
  * @param {boolean} [options.esModule]
  * @param {string} [options.id]
  * @param {Map<string, string>} [options.initialFiles]
+ * @param {string} [options.compiler]
  * @returns {Promise<[SandboxSession, function(): Promise<void>]>}
  */
 async function getSandbox({
     esModule = false,
     id = nanoid(),
     initialFiles = new Map(),
+    compiler = "webpack",
 } = {}) {
     const port = await getPort();
 
@@ -88,19 +96,38 @@ async function getSandbox({
     await fse.remove(sandboxDir);
     // Create the sandbox source directory
     await fse.mkdirp(srcDir);
-    // Create the sandbox public directory
-    await fse.mkdirp(publicDir);
 
     // Write necessary files to sandbox
-    await fse.writeFile(
-        path.join(sandboxDir, "webpack.config.js"),
-        getWDSConfig(srcDir.normalize().replace(/\\/g, "\\\\"))
-    );
-    await fse.writeFile(path.join(publicDir, "index.html"), getIndexHTML(port));
-    await fse.writeFile(
-        path.join(srcDir, "package.json"),
-        getPackageJson(esModule)
-    );
+    if (compiler === "webpack") {
+        // Create the sandbox public directory
+        await fse.mkdirp(publicDir);
+
+        await fse.writeFile(
+            path.join(sandboxDir, "webpack.config.js"),
+            getWDSConfig(srcDir.normalize().replace(/\\/g, "\\\\"))
+        );
+
+        await fse.writeFile(
+            path.join(publicDir, "index.html"),
+            getIndexHTML(port)
+        );
+        await fse.writeFile(
+            path.join(srcDir, "package.json"),
+            getPackageJson(esModule)
+        );
+    } else if (compiler === "vite") {
+        await fse.writeFile(
+            path.join(srcDir, "index.html"),
+            getViteEntry(port)
+        );
+        await fse.writeFile(
+            path.join(sandboxDir, "vite.config.js"),
+            getViteConfig(srcDir.normalize().replace(/\\/g, "\\\\"))
+        );
+    } else {
+        throw new Error(`Unknown compiler ${compiler}`);
+    }
+
     await fse.writeFile(
         path.join(srcDir, "index.js"),
         esModule
@@ -114,11 +141,18 @@ async function getSandbox({
     }
 
     // TODO: Add handling for webpack-hot-middleware and webpack-plugin-serve
-    const app = await spawnWebpackServe(port, {
-        public: publicDir,
-        root: sandboxDir,
-        src: srcDir,
-    });
+    const app =
+        compiler === "webpack"
+            ? await spawnWebpackServe(port, {
+                  public: publicDir,
+                  root: sandboxDir,
+                  src: srcDir,
+              })
+            : await spawnVite(port, {
+                  public: publicDir,
+                  root: sandboxDir,
+                  src: srcDir,
+              });
 
     /** @type {import('puppeteer').Page} */
     const page = await browser.newPage();
