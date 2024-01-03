@@ -13,7 +13,7 @@ module.exports = function middleware(req, res, next) {
             );
         } else {
             launch(path.resolve(file));
-            res.end();
+            res.end("<script>window.close();</script>");
         }
     } else {
         next();
