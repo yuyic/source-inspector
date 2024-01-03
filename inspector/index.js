@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-
 const RootDir = path.resolve(__dirname, "src");
 const OutDir = path.resolve(__dirname, "dist");
 const AssetsDir = "__open_editor_assets__";

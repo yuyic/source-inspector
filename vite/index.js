@@ -2,8 +2,7 @@ const path = require("path");
 const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
-const createLaunchEditorMiddleware = require("launch-editor-middleware");
-
+const middleware = require("../middleware");
 /**
  * @param {Object} [options]
  * @param {string} [options.hotKey]
@@ -42,10 +41,7 @@ module.exports = function OpenEditorPlugin(options) {
             return config;
         },
         configureServer(server) {
-            server.middlewares.use(
-                "/__launch__",
-                createLaunchEditorMiddleware()
-            );
+            server.middlewares.use(middleware);
         },
         transform(code, id) {
             const opts = createOptions(id);

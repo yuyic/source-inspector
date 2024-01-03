@@ -6,8 +6,10 @@ export const vite: (options?: {
     name: string;
     enforce: string;
     config(config: any): any;
+    configureServer(server: any): void;
     transform(code: any, id: any): any;
     transformIndexHtml(html: any): any;
 };
 export const inspector: typeof import("./inspector");
 export const ast: typeof import("./ast");
+export const middleware: (req: any, res: any, next: any) => void;

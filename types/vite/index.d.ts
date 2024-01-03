@@ -5,6 +5,7 @@ declare function _exports(options?: {
     name: string;
     enforce: string;
     config(config: any): any;
+    configureServer(server: any): void;
     transform(code: any, id: any): any;
     transformIndexHtml(html: any): any;
 };

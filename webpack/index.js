@@ -7,8 +7,7 @@ const {
     readTemplate,
     extractInspectorCode,
 } = require("../inspector");
-const createLaunchEditorMiddleware = require("launch-editor-middleware");
-
+const middleware = require("../middleware");
 class OpenInEditorPlugin {
     /**
      * @param {Object} [options]
@@ -107,10 +106,7 @@ class OpenInEditorPlugin {
                     if (rawAfterSetup) {
                         rawAfterSetup(devServer);
                     }
-                    devServer.app.use(
-                        "/__launch__",
-                        createLaunchEditorMiddleware()
-                    );
+                    devServer.app.use(middleware);
                 },
             }
         );
