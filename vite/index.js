@@ -7,6 +7,7 @@ const middleware = require("../middleware");
  * @param {Object} [options]
  * @param {string} [options.hotKey]
  * @param {string} [options.editor]
+ * @returns {import("vite").PluginOption}
  */
 module.exports = function OpenEditorPlugin(options) {
     const CWD = process.cwd();

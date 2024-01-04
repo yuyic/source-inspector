@@ -10,3 +10,4 @@ npm-exec.bat
 .vscode
 **/dist
 test/__tmp__
+**/*.d.ts

@@ -11,11 +11,9 @@
     "vite",
     "ast",
     "index.js",
-    "middleware.js",
-    "types"
+    "middleware.js"
   ],
   "main": "index.js",
-  "types": "types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuyic/source-inspector"
@@ -31,7 +29,7 @@
     "yalc:add": "yalc add --dev source-inspector",
     "yalc:clean": "yalc remove --all",
     "yalc:publish": "yalc publish --no-scripts",
-    "types:clean": "rimraf types",
+    "types:clean": "bash ./clean_types.sh",
     "types:compile": "tsc -p tsconfig.json",
     "generate-types": "run-s types:clean types:compile",
     "prepublishOnly": "yarn generate-types"

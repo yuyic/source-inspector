@@ -1,0 +1,1 @@
+find . -name '*.d.ts' -not -path './node_modules/*' -exec rm {} \;
