@@ -11,6 +11,6 @@
     "target": "es2018",
     "skipLibCheck": true
   },
-  "include": ["index.js", "middleware.js", "./webpack/*", "./vite/*"],
+  "include": ["index.js", "launch.js", "./webpack/*", "./vite/*"],
   "exclude": ["node_modules"]
 }

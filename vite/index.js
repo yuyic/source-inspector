@@ -2,7 +2,7 @@ const path = require("path");
 const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
-const middleware = require("../middleware");
+const launch = require("../launch");
 /**
  * @param {Object} [options]
  * @param {string} [options.hotKey]
@@ -33,15 +33,14 @@ module.exports = function OpenEditorPlugin(options) {
 
     const assetsAbsDir = path.resolve(OutDir, AssetsDir);
     const template = readTemplate(publicPath);
+    const urlPromise = launch();
+
     return {
         name: "source-inspector",
         enforce: "pre",
         config(config) {
             setObjValue(config, "server.fs.strict", false);
             return config;
-        },
-        configureServer(server) {
-            server.middlewares.use(middleware);
         },
         transform(code, id) {
             const opts = createOptions(id);
@@ -53,7 +52,8 @@ module.exports = function OpenEditorPlugin(options) {
             }
             return code;
         },
-        transformIndexHtml(html) {
+        async transformIndexHtml(html) {
+            const url = await urlPromise;
             const templateContent = template.replaceAll(
                 AssetsDir,
                 assetsAbsDir
@@ -69,6 +69,7 @@ module.exports = function OpenEditorPlugin(options) {
                             if(typeof document !== 'undefined'){
                                 window.__open_in_editor__ = ${JSON.stringify({
                                     hotKey: options?.hotKey || 18,
+                                    url,
                                 })};
                             }
                         })();

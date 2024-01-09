@@ -7,7 +7,10 @@ const {
     readTemplate,
     extractInspectorCode,
 } = require("../inspector");
-const middleware = require("../middleware");
+const launch = require("../launch");
+const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const cwd = process.cwd();
+
 class OpenInEditorPlugin {
     /**
      * @param {Object} [options]
@@ -93,24 +96,6 @@ class OpenInEditorPlugin {
         //     }
         // };
 
-        const rawAfterSetup =
-            compiler.options.devServer?.onAfterSetupMiddleware;
-        compiler.options.devServer = Object.assign(
-            {},
-            compiler.options.devServer,
-            {
-                onAfterSetupMiddleware(devServer) {
-                    if (!devServer) {
-                        throw new Error("webpack-dev-server is not defined");
-                    }
-                    if (rawAfterSetup) {
-                        rawAfterSetup(devServer);
-                    }
-                    devServer.app.use(middleware);
-                },
-            }
-        );
-
         compiler.options.module?.rules.push({
             test: /\.(js|mjs|jsx|ts|tsx|vue)$/,
             exclude: [/node_modules/],
@@ -122,41 +107,99 @@ class OpenInEditorPlugin {
             },
         });
 
+        const cache = new WeakMap();
+        const matchObject = ModuleFilenameHelpers.matchObject.bind(undefined, {
+            include: compiler.options.bundleName
+                ? compiler.options.bundleName + ".js"
+                : /\.js$/,
+        });
+        const htmlPromise = launch().then((url) => {
+            return `
+            (function(){
+                if(typeof document !== 'undefined'){
+                    ${extractInspectorCode(template)}
+                    window.__open_in_editor__ = ${JSON.stringify({
+                        url,
+                        hotKey: this.options.hotKey,
+                    })};
+                }
+            })();
+            `;
+        });
+
+        const emitHtml = async (compilation) => {
+            const html = await htmlPromise;
+            for (const chunk of compilation.chunks) {
+                if (!chunk.canBeInitial()) {
+                    continue;
+                }
+                for (const file of chunk.files) {
+                    if (!matchObject(file)) {
+                        continue;
+                    }
+
+                    const data = {
+                        chunk,
+                        filename: file,
+                    };
+                    const comment = compilation.getPath(html, data);
+
+                    const asset = compilation.getAsset(file);
+
+                    let cached = cache.get(asset);
+                    if (!cached || cached.comment !== comment) {
+                        const source = new sources.ConcatSource(
+                            comment,
+                            "\n",
+                            asset.source.source().toString("utf-8")
+                        );
+                        cache.set(asset, { source, comment });
+                    }
+
+                    compilation.updateAsset(file, cache.get(asset).source);
+                }
+            }
+        };
+
         if (webpackVersion === 4) {
             compiler.hooks.emit.tap(pluginName, (compilation) => {
                 emitAssets(compilation, compilation.assets);
             });
         } else {
             compiler.hooks.compilation.tap(pluginName, (compilation) => {
-                compilation.hooks.processAssets.tap(
+                compilation.hooks.processAssets.tapAsync(
                     {
                         name: pluginName,
-                        stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
-                        additionalAssets: true,
+                        stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
                     },
-                    (assets) => {
+                    (assets, cb) => {
                         emitAssets(compilation, assets);
+                        emitHtml(compilation).then(() => {
+                            cb();
+                        });
                     }
                 );
             });
         }
-        new webpack.BannerPlugin({
-            entryOnly: true,
-            include: compiler.options.bundleName
-                ? compiler.options.bundleName + ".js"
-                : /\.js$/,
-            raw: true,
-            banner: `
-            (function(){
-                if(typeof document !== 'undefined'){
-                    ${extractInspectorCode(template)}
-                    window.__open_in_editor__ = ${JSON.stringify({
-                        hotKey: this.options.hotKey,
-                    })};
-                }
-            })();
-            `,
-        }).apply(compiler);
+        // new webpack.BannerPlugin({
+        //     entryOnly: true,
+        //     include: compiler.options.bundleName
+        //         ? compiler.options.bundleName + ".js"
+        //         : /\.js$/,
+        //     raw: true,
+        //     banner: () => {
+        //         return `
+        //         (function(){
+        //             if(typeof document !== 'undefined'){
+        //                 ${extractInspectorCode(template)}
+        //                 window.__open_in_editor__ = ${JSON.stringify({
+        //                     hotKey: this.options.hotKey,
+        //                 })};
+        //             }
+        //         })();
+        //         `;
+        //     },
+        // }).apply(compiler);
     }
 }
 

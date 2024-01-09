@@ -25,12 +25,7 @@ module.exports = {
     })
   ]
 }
-```
-> **Note**
-> You should use source-inspect's middleware in customized devServer
-```
-require('source-inspector').middleware;
-```
+
 ## Vite
 ```
 import SourceInspectorPlugin from "source-inspector/vite";
