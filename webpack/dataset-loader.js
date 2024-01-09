@@ -13,7 +13,10 @@ const schema = {
         },
     },
 };
-
+/**
+ * @param {string} [source]
+ * @returns
+ */
 module.exports = function loader(source) {
     const filename = this.resourcePath;
     if (!filename || filename.match(/node_modules/g)) {
@@ -43,15 +46,14 @@ module.exports = function loader(source) {
     };
 
     // TODO vue
-    try{
+    try {
         if (isVue) {
             return vueDataset(source, options);
         } else {
             return reactDataset(source, options);
         }
-    }
-    catch(e){
-        console.log('[source-inspector] %s %s', options.filename, e.message);
+    } catch (e) {
+        console.log("[source-inspector] %s %s", options.filename, e.message);
         return source;
     }
 };
