@@ -61,7 +61,7 @@ function getPackageJson(esModule = false) {
 function getWDSConfig(srcDir) {
     return `
 const { DefinePlugin, ProgressPlugin } = require('webpack');
-const { webpack:SourceInspectorPlugin } = require("source-inspector");
+const SourceInspectorPlugin = require("source-inspector/webpack");
 
 
 module.exports = {
@@ -127,7 +127,7 @@ module.exports = {
  */
 function getViteConfig(srcDir, OutDir) {
     return `
-    const { vite:SourceInspectorPlugin } = require("source-inspector");
+    const SourceInspectorPlugin = require("source-inspector/vite");
     const { defineConfig } = require("vite");
 
     module.exports = defineConfig({
