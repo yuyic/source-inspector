@@ -2,15 +2,18 @@
 
 * Inspect html elements' source code in IDE
 
-![](./20220225_151400.gif)
+![demo](./20220225_151400.gif)
 
 ```bash
-npm install source-inspector --save-dev # or yarn add source-inspector --save-dev
+npm install source-inspector --save-dev
 ```
+
+> **Note**
+You may need to install the editor command line to your PATH, ([install jetbrain command line](https://github.com/yyx990803/launch-editor/issues/4#issuecomment-359348189), [install vscode command line](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line))
 
 ## Webpack（version 4 or 5）
 
-```
+```js
 const SourceInspectorWebpackPlugin = require('source-inspector/webpack')
 
 module.exports = {
@@ -25,9 +28,11 @@ module.exports = {
     })
   ]
 }
+```
 
 ## Vite
-```
+
+```js
 import SourceInspectorPlugin from "source-inspector/vite";
 
 export default defineConfig({
@@ -37,4 +42,3 @@ export default defineConfig({
 ```
 
 ### `Support react and vue`
-
