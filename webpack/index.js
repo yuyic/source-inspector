@@ -162,8 +162,9 @@ class OpenInEditorPlugin {
         };
 
         if (webpackVersion === 4) {
-            compiler.hooks.emit.tap(pluginName, (compilation) => {
+            compiler.hooks.emit.tapAsync(pluginName, (compilation, cb) => {
                 emitAssets(compilation, compilation.assets);
+                emitHtml(compilation).then(() => cb());
             });
         } else {
             compiler.hooks.compilation.tap(pluginName, (compilation) => {
@@ -181,25 +182,6 @@ class OpenInEditorPlugin {
                 );
             });
         }
-        // new webpack.BannerPlugin({
-        //     entryOnly: true,
-        //     include: compiler.options.bundleName
-        //         ? compiler.options.bundleName + ".js"
-        //         : /\.js$/,
-        //     raw: true,
-        //     banner: () => {
-        //         return `
-        //         (function(){
-        //             if(typeof document !== 'undefined'){
-        //                 ${extractInspectorCode(template)}
-        //                 window.__open_in_editor__ = ${JSON.stringify({
-        //                     hotKey: this.options.hotKey,
-        //                 })};
-        //             }
-        //         })();
-        //         `;
-        //     },
-        // }).apply(compiler);
     }
 }
 
