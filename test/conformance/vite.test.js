@@ -1,7 +1,7 @@
 const getSandbox = require("../sandbox");
 
 it("vite re-runs accepted modules", async () => {
-    const [session, cleanupSandbox] = await getSandbox({
+    const [session] = await getSandbox({
         esModule: true,
         compiler: "vite",
     });
@@ -21,7 +21,7 @@ it("vite re-runs accepted modules", async () => {
 });
 
 it("vite element click", async () => {
-    const [session, cleanupSandbox] = await getSandbox({
+    const [session] = await getSandbox({
         esModule: true,
         compiler: "vite",
     });
