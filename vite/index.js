@@ -1,8 +1,9 @@
+const slash = require("slash");
 const path = require("path");
 const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
 const { setObjValue } = require("./utils");
-const middleware = require("../middleware");
+const launch = require("../launch");
 /**
  * @param {Object} [options]
  * @param {string} [options.hotKey]
@@ -33,6 +34,9 @@ module.exports = function OpenEditorPlugin(options) {
 
     const assetsAbsDir = path.resolve(OutDir, AssetsDir);
     const template = readTemplate(publicPath);
+    const urlPromise = launch();
+    let defaultResolvePlugin;
+
     return {
         name: "source-inspector",
         enforce: "pre",
@@ -40,8 +44,10 @@ module.exports = function OpenEditorPlugin(options) {
             setObjValue(config, "server.fs.strict", false);
             return config;
         },
-        configureServer(server) {
-            server.middlewares.use(middleware);
+        configResolved(config) {
+            defaultResolvePlugin = config.plugins.find(
+                (i) => i.name === "vite:resolve"
+            );
         },
         transform(code, id) {
             const opts = createOptions(id);
@@ -53,11 +59,22 @@ module.exports = function OpenEditorPlugin(options) {
             }
             return code;
         },
-        transformIndexHtml(html) {
-            const templateContent = template.replaceAll(
-                AssetsDir,
-                assetsAbsDir
-            );
+        async resolveId(id, importer, resolveOpts) {
+            if (!defaultResolvePlugin?.resolveId) return null;
+
+            if (id.startsWith(`/${AssetsDir}`)) {
+                const result = await defaultResolvePlugin.resolveId.call(
+                    this,
+                    slash(path.join("/@fs", OutDir, id)),
+                    importer,
+                    resolveOpts || {}
+                );
+
+                return result;
+            }
+        },
+        async transformIndexHtml(html) {
+            const url = await urlPromise;
             return html.replace(
                 /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
                 (a, b) => {
@@ -69,12 +86,13 @@ module.exports = function OpenEditorPlugin(options) {
                             if(typeof document !== 'undefined'){
                                 window.__open_in_editor__ = ${JSON.stringify({
                                     hotKey: options?.hotKey || 18,
+                                    url,
                                 })};
                             }
                         })();
                     </script>
                     ` +
-                        templateContent
+                        template
                     );
                 }
             );

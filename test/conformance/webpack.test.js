@@ -9,13 +9,17 @@ it("re-runs accepted modules", async () => {
     expect(session.logs).toStrictEqual(["init"]);
 
     const config = await session.evaluate(() => window.__open_in_editor__);
-    expect(config).toEqual({
-        hotKey: 18,
-    });
+    expect(config).toEqual(
+        expect.objectContaining({
+            hotKey: expect.any(Number),
+            url: expect.any(String),
+        })
+    );
 });
 
 it("element click", async () => {
     const [session] = await getSandbox({ esModule: true });
+    const url = await session.evaluate(() => window.__open_in_editor__?.url);
 
     await session.write(
         "index.js",
@@ -26,5 +30,5 @@ it("element click", async () => {
     );
     await session.reload();
     await session.inspect("#click");
-    expect(session.logs[0]).toMatch(/^\/__launch__\?file=/);
+    expect(session.logs[0]).toMatch(new RegExp(`^${url}?`));
 });

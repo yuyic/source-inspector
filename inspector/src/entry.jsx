@@ -4,7 +4,6 @@ import { App } from "./app";
 const config = {
     hotKey: 18,
     dataKey: "data-open-in-editor",
-    editor: "vscode",
     ...window.__open_in_editor__,
 };
 

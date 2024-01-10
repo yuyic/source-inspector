@@ -71,6 +71,15 @@ const rootSandboxDir = path.join(__dirname, "..", "__tmp__");
 const posixPath = (str) => str.split(path.sep).join(path.posix.sep);
 
 /**
+ *
+ * @param {*} fn
+ * @returns {Function}
+ */
+function runnable(fn) {
+    return new Function("arguments", `return ${fn.toString()}(arguments)`);
+}
+
+/**
  * Creates a Webpack and Puppeteer backed sandbox to execute HMR operations on.
  * @param {Object} [options]
  * @param {boolean} [options.esModule]
@@ -111,10 +120,6 @@ async function getSandbox({
             path.join(publicDir, "index.html"),
             getIndexHTML(port)
         );
-        await fse.writeFile(
-            path.join(srcDir, "package.json"),
-            getPackageJson(esModule)
-        );
     } else if (compiler === "vite") {
         await fse.writeFile(
             path.join(srcDir, "index.html"),
@@ -127,6 +132,11 @@ async function getSandbox({
     } else {
         throw new Error(`Unknown compiler ${compiler}`);
     }
+
+    await fse.writeFile(
+        path.join(srcDir, "package.json"),
+        getPackageJson(esModule)
+    );
 
     await fse.writeFile(
         path.join(srcDir, "index.js"),
@@ -293,6 +303,8 @@ async function getSandbox({
              * @param {string} key
              */
             async inspect(selector) {
+                const handler = await page.waitForSelector(selector);
+                await page.keyboard.down("Alt");
                 await page.evaluate(() => {
                     const originWindowOpen = window.open;
                     window.open = function (...args) {
@@ -300,8 +312,6 @@ async function getSandbox({
                         originWindowOpen.apply(null, args);
                     };
                 });
-                const handler = await page.waitForSelector(selector);
-                await page.keyboard.down("Alt");
                 await page.evaluate((element) => element.click(), handler);
                 await page.keyboard.up("Alt");
                 await handler.dispose();

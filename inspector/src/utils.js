@@ -64,7 +64,9 @@ export function getElementDimensions(domElement) {
 // };
 
 export function launchEditor({ editor, path, line, column }) {
-    const baseUrl = "/__launch__?file={path}:{line}:{column}";
+    const baseUrl = `${
+        window.__open_in_editor__?.url || ""
+    }/?file={path}:{line}:{column}`;
     const url = baseUrl.replace(/{(.*?)}/g, (_, mark) => {
         return mark === "path" ? path : mark === "line" ? line : column;
     });
