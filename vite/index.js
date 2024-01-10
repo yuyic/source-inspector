@@ -1,3 +1,4 @@
+const slash = require("slash");
 const path = require("path");
 const { reactDataset, vueDataset } = require("../ast");
 const { AssetsDir, OutDir, readTemplate } = require("../inspector");
@@ -34,6 +35,7 @@ module.exports = function OpenEditorPlugin(options) {
     const assetsAbsDir = path.resolve(OutDir, AssetsDir);
     const template = readTemplate(publicPath);
     const urlPromise = launch();
+    let defaultResolvePlugin;
 
     return {
         name: "source-inspector",
@@ -41,6 +43,11 @@ module.exports = function OpenEditorPlugin(options) {
         config(config) {
             setObjValue(config, "server.fs.strict", false);
             return config;
+        },
+        configResolved(config) {
+            defaultResolvePlugin = config.plugins.find(
+                (i) => i.name === "vite:resolve"
+            );
         },
         transform(code, id) {
             const opts = createOptions(id);
@@ -52,12 +59,22 @@ module.exports = function OpenEditorPlugin(options) {
             }
             return code;
         },
+        async resolveId(id, importer, resolveOpts) {
+            if (!defaultResolvePlugin?.resolveId) return null;
+
+            if (id.startsWith(`/${AssetsDir}`)) {
+                const result = await defaultResolvePlugin.resolveId.call(
+                    this,
+                    slash(path.join("/@fs", OutDir, id)),
+                    importer,
+                    resolveOpts || {}
+                );
+
+                return result;
+            }
+        },
         async transformIndexHtml(html) {
             const url = await urlPromise;
-            const templateContent = template.replaceAll(
-                AssetsDir,
-                assetsAbsDir
-            );
             return html.replace(
                 /(?<=<body>)([\s\S]*?)(?=<\/body>)/g,
                 (a, b) => {
@@ -75,7 +92,7 @@ module.exports = function OpenEditorPlugin(options) {
                         })();
                     </script>
                     ` +
-                        templateContent
+                        template
                     );
                 }
             );
