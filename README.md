@@ -8,8 +8,10 @@
 npm install source-inspector --save-dev
 ```
 
-> **Note**
-You may need to install the editor command line to your PATH, ([install jetbrain command line](https://github.com/yyx990803/launch-editor/issues/4#issuecomment-359348189), [install vscode command line](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line))
+### Note!!
+**You may need to install the launch command line of your IDE**
+- [For webstorm](https://github.com/yyx990803/launch-editor/issues/4#issuecomment-359348189) 
+- [For vscode](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line)
 
 ## Webpack（version 4 or 5）
 
