@@ -44,10 +44,12 @@
     "@babel/traverse": "^7.17.3",
     "@babel/types": "^7.17.0",
     "@vue/compiler-dom": "^3.2.31",
+    "get-port": "5.1.1",
     "launch-editor-middleware": "^2.6.0",
     "loader-utils": "^2.0.2",
     "magic-string": "^0.26.1",
-    "schema-utils": "^3.1.0"
+    "schema-utils": "^3.1.0",
+    "slash": "3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
@@ -56,7 +58,6 @@
     "babel-loader": "8.1.0",
     "cross-env": "^7.0.3",
     "fs-extra": "^10.0.0",
-    "get-port": "5.1.1",
     "is-electron": "^2.2.1",
     "jest": "^27.5.1",
     "jest-environment-node": "27.5.1",
