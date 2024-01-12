@@ -51,7 +51,7 @@ jobs:
               run: yarn version --patch
 
             - name: Push to master
-              run: git push --follow-tags origin master
+              run: git push --follow-tags git@github.com:${{ github.repository }}.git HEAD:	${{ github.ref }}
 
             - name: Publish to NPM
               run: npm publish --access public
